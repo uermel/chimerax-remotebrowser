@@ -24,3 +24,8 @@ Currently the following data sources are supported:
 - SFTP (via sshfs)
 
 Support for additional data sources can be added by implementing the `AbstractFileSystem` interface.
+
+## Demo
+
+Short demo using the public cryoet-data-portal bucket:
+
