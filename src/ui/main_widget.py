@@ -171,7 +171,7 @@ class MainWidget(QWidget):
         if not item.is_file and not self.readable_directory(item.path):
             return
 
-        if self.readable_directory(item.path):
+        if not item.is_file and self.readable_directory(item.path):
             self.openable_directory_clicked.emit(item)
             return
 
