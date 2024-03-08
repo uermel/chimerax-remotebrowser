@@ -6,8 +6,9 @@ can be cached locally for fast access or streamed directly from the remote sourc
 ## Installation
 
 1. Install [ChimeraX](https://www.cgl.ucsf.edu/chimerax/download.html)
-2. Download the most recent build from the [releases page.](https://github.com/czimaginginstitute/chimerax-remotebrowser/releases)
-3. Run the following command in the ChimeraX command prompt to install the plugin:
+2. Optional: install [ChimeraX-OME-Zarr](https://github.com/czimaginginstitute/chimerax-ome-zarr) for the best experience. 
+3. Download the most recent build from the [releases page.](https://github.com/czimaginginstitute/chimerax-remotebrowser/releases)
+4. Run the following command in the ChimeraX command prompt to install the plugin:
 ```
 toolshed install /path/to/ChimeraX_RemoteBrowser-0.1-py3-none-any.whl
 ```
