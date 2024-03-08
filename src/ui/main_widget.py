@@ -24,13 +24,14 @@ from ..misc.util import openable_suffixes
 from ..conn.connector import Connector
 from ..conn.sshfs_connector import SSHFSConnector
 from .sshfs_widgets import SSHFSDialog
-from .QFSSpecModel import QFSSpecModel
+from .QFSSpecModel import QFSSpecModel, FSTreeItem
 from fonticon_mdi7 import MDI7
 from superqt.fonticon import icon
 
 
 class MainWidget(QWidget):
     file_caching_finished = Signal(str)
+    openable_directory_clicked = Signal(FSTreeItem)
 
     def __init__(
         self,
@@ -133,6 +134,10 @@ class MainWidget(QWidget):
             self.fs = None
 
     def _attempt_connection(self):
+        # Remove old if any
+        if self.model:
+            self._disconnect()
+
         # try:
         fs, root = self.fstypes[self.connection_type].connect()
         print(f"Root: {root}")
@@ -147,11 +152,29 @@ class MainWidget(QWidget):
             self._tree_view.setModel(self.model)
             self._tree_view.resizeColumnToContents(0)
 
+    def readable_directory(self, name: str):
+        ext = os.path.splitext(name)[1]
+        if not ext:
+            return
+
+        if ext in self.openable_suffixes:
+            return True
+        else:
+            return False
+
     async def _cache_file(self, index: QModelIndex):
         if not index.isValid():
             return
 
         item = index.internalPointer()
+
+        if not item.is_file and not self.readable_directory(item.path):
+            return
+
+        if self.readable_directory(item.path):
+            self.openable_directory_clicked.emit(item)
+            return
+
         target = "/tmp/" + item.path.lstrip("/")
 
         if item.is_cached and os.path.exists(target):

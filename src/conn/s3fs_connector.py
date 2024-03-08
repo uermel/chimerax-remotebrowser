@@ -32,6 +32,9 @@ class S3FSConnector(Connector):
         profile = self.input_widget.profile
         root = self.input_widget.root
 
+        if not root:
+            root = "/"
+
         return profile, root
 
     def connect(self):

@@ -1,4 +1,5 @@
 # General
+import os.path
 from functools import partial
 from sys import platform
 from qt_async_threads import QtAsyncRunner
@@ -29,10 +30,11 @@ from .misc.settings import RemoteBrowserSettings
 from .misc.util import openable_suffixes
 from .conn.sshfs_connector import SSHFSConnector
 from .conn.s3fs_connector import S3FSConnector
+from .ui.QFSSpecModel import FSTreeItem
 
 FSTYPES = {
-    "sshfs": SSHFSConnector,
     "s3fs": S3FSConnector,
+    "sshfs": SSHFSConnector,
 }
 
 
@@ -78,6 +80,15 @@ class RemoteBrowserTool(ToolInstance):
         self.tool_window = MainToolWindow(self, close_destroys=False)
         self._build_ui()
 
+        # Zarr plugin available?
+        self.can_read_omezarr = False
+        try:
+            from chimerax.ome_zarr.open import open_ome_zarr_from_fs
+
+            self.can_read_omezarr = True
+        except Exception as e:
+            self.can_read_omezarr = False
+
     def _build_ui(self):
         tw = self.tool_window
 
@@ -91,8 +102,19 @@ class RemoteBrowserTool(ToolInstance):
         tw.manage("left")
 
         self._mw.file_caching_finished.connect(self.open_file)
+        self._mw.openable_directory_clicked.connect(self.open_dir)
 
-    def open_file(self, path):
+    def open_file(self, path: str):
         from chimerax.core.commands import run
 
         run(self.session, f"open {path}")
+
+    def open_dir(self, item: FSTreeItem):
+        if self.can_read_omezarr and os.path.splitext(item.path)[1] == ".zarr":
+            from chimerax.ome_zarr.open import open_ome_zarr_from_fs
+
+            models, msg = open_ome_zarr_from_fs(
+                self.session, item.fs, item.path, initial_step=(1, 1, 1)
+            )
+
+            self.session.models.add(models)
