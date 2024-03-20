@@ -1,4 +1,5 @@
 import functools
+import os
 
 import aiobotocore
 import s3fs
@@ -40,15 +41,20 @@ class S3FSConnector(Connector):
     def connect(self):
         profile, root = self.get_input()
 
-        print(f"Connecting to {root} using AWS profile {profile}")
-
         fs = None
         try:
             if profile:
+                print(f"Connecting to {root} using AWS profile {profile}")
                 aiosess = aiobotocore.session.AioSession(profile=profile)
                 fs = s3fs.S3FileSystem(session=aiosess)
             else:
-                fs = s3fs.S3FileSystem()
+                if "AWS_PROFILE" in os.environ:
+                    print(f"Connecting to {root} using AWS profile {os.environ['AWS_PROFILE']}")
+                    aiosess = aiobotocore.session.AioSession(profile=os.environ["AWS_PROFILE"])
+                    fs = s3fs.S3FileSystem(session=aiosess)
+                else:
+                    print(f"Connecting to {root} anonymously")
+                    fs = s3fs.S3FileSystem(anon=True)
         except Exception as e:
             print(f"Error: {e}")
             return None, None

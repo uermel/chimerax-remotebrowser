@@ -1,5 +1,5 @@
 <BundleInfo name="ChimeraX-RemoteBrowser"
-	    version="0.1.1" package="chimerax.RemoteBrowser"
+	    version="0.2" package="chimerax.RemoteBrowser"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->
