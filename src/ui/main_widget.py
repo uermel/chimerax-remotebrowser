@@ -140,7 +140,10 @@ class MainWidget(QWidget):
 
         # try:
         fs, root = self.fstypes[self.connection_type].connect()
-        print(f"Root: {root}")
+
+        if fs is None and root is None:
+            print("Connection failed.")
+            return
 
         if fs:
             self.fs = fs

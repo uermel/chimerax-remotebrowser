@@ -28,6 +28,7 @@ from Qt.QtWidgets import (
 from .ui.main_widget import MainWidget
 from .misc.settings import RemoteBrowserSettings
 from .misc.util import openable_suffixes
+from .misc.env import env_if_mac
 from .conn.sshfs_connector import SSHFSConnector
 from .conn.s3fs_connector import S3FSConnector
 from .ui.QFSSpecModel import FSTreeItem
@@ -88,6 +89,9 @@ class RemoteBrowserTool(ToolInstance):
             self.can_read_omezarr = True
         except Exception as e:
             self.can_read_omezarr = False
+
+        # If on MAC, add the zsh profile to the path (for AWS authentication)
+        env_if_mac()
 
     def _build_ui(self):
         tw = self.tool_window
