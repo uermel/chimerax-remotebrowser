@@ -31,3 +31,8 @@ Support for additional data sources can be added by implementing the `AbstractFi
 ## Demo
 
 Short demo using the public cryoet-data-portal bucket:
+
+https://github.com/uermel/chimerax-remotebrowser/assets/6641113/804ee590-ebbb-4928-98bc-414a5a57e894
+
+
+
