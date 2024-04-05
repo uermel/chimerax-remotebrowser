@@ -1,41 +1,29 @@
 # General
 import os.path
-from functools import partial
 from sys import platform
-from qt_async_threads import QtAsyncRunner
 
 # ChimeraX
 from chimerax.core.tools import ToolInstance
 from chimerax.ui import MainToolWindow
-from chimerax.open_command.cmd import FileInfo, collated_open
 
 # Qt
-from Qt.QtCore import Qt
-from Qt.QtGui import QFont, QKeySequence
+from Qt.QtGui import QFont
 from Qt.QtWidgets import (
-    QAction,
-    QFileDialog,
-    QGroupBox,
-    QHBoxLayout,
-    QMenu,
-    QMenuBar,
-    QPushButton,
     QVBoxLayout,
-    QSizePolicy,
 )
+
+from .conn.s3fs_connector import S3FSConnector
+from .misc.env import env_if_mac
+from .misc.settings import RemoteBrowserSettings
+from .misc.util import openable_suffixes
 
 # This tool
 from .ui.main_widget import MainWidget
-from .misc.settings import RemoteBrowserSettings
-from .misc.util import openable_suffixes
-from .misc.env import env_if_mac
-from .conn.sshfs_connector import SSHFSConnector
-from .conn.s3fs_connector import S3FSConnector
 from .ui.QFSSpecModel import FSTreeItem
 
 FSTYPES = {
     "s3fs": S3FSConnector,
-    "sshfs": SSHFSConnector,
+    #    "sshfs": SSHFSConnector,
 }
 
 
@@ -72,9 +60,7 @@ class RemoteBrowserTool(ToolInstance):
 
         self.settings = RemoteBrowserSettings(session, "RemoteBrowser", version="1")
         """Default values for different file systems."""
-        self.fstypes = {
-            k: clz(**getattr(self.settings, k)) for k, clz in FSTYPES.items()
-        }
+        self.fstypes = {k: clz(**getattr(self.settings, k)) for k, clz in FSTYPES.items()}
         """The available remote file system types."""
 
         # UI
@@ -84,10 +70,8 @@ class RemoteBrowserTool(ToolInstance):
         # Zarr plugin available?
         self.can_read_omezarr = False
         try:
-            from chimerax.ome_zarr.open import open_ome_zarr_from_fs
-
             self.can_read_omezarr = True
-        except Exception as e:
+        except Exception:
             self.can_read_omezarr = False
 
         # If on MAC, add the zsh profile to the path (for AWS authentication)
@@ -97,9 +81,7 @@ class RemoteBrowserTool(ToolInstance):
         tw = self.tool_window
 
         self._layout = QVBoxLayout()
-        self._mw = MainWidget(
-            self.fstypes, openable_suffixes=openable_suffixes(self.session)
-        )
+        self._mw = MainWidget(self.fstypes, openable_suffixes=openable_suffixes(self.session))
         self._layout.addWidget(self._mw)
 
         tw.ui_area.setLayout(self._layout)
@@ -117,8 +99,6 @@ class RemoteBrowserTool(ToolInstance):
         if self.can_read_omezarr and os.path.splitext(item.path)[1] == ".zarr":
             from chimerax.ome_zarr.open import open_ome_zarr_from_fs
 
-            models, msg = open_ome_zarr_from_fs(
-                self.session, item.fs, item.path, initial_step=(1, 1, 1)
-            )
+            models, msg = open_ome_zarr_from_fs(self.session, item.fs, item.path, initial_step=(4, 4, 4))
 
             self.session.models.add(models)
