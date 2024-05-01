@@ -3,14 +3,14 @@ requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
 
 [project]
 name = "ChimeraX-RemoteBrowser"
-version = "0.3.0"
+version = "0.4.0"
 dynamic = ["classifiers", "requires-python"]
 dependencies = [
     "ChimeraX-Core~=1.7.1",
     "ChimeraX-ArtiaX",
     "ChimeraX-OME-Zarr",
     "sshfs",
-    "s3fs",
+    "s3fs>=2024.3.1",
     "qasync",
     "qt-async-threads",
     "fonticon-materialdesignicons7",
