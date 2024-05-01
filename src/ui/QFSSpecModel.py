@@ -2,7 +2,7 @@ from Qt.QtCore import Qt, QAbstractItemModel, QModelIndex
 from Qt.QtWidgets import QFileIconProvider, QStyle, QApplication
 from Qt.QtGui import QMovie, QIcon
 
-from pathlib import Path, PosixPath
+from pathlib import Path, PurePosixPath
 from fsspec import AbstractFileSystem
 from typing import Union, Any, List
 from fonticon_mdi7 import MDI7
@@ -23,7 +23,7 @@ def file_size(size: int) -> str:
 
 
 class FSTreeItem:
-    def __init__(self, fs: AbstractFileSystem, path: PosixPath, parent=None):
+    def __init__(self, fs: AbstractFileSystem, path: PurePosixPath, parent=None):
         try:
             self.fs = fs
             self._path = path
@@ -46,7 +46,7 @@ class FSTreeItem:
             return []
 
         if self._children is None:
-            items = [PosixPath(p) for p in self.fs.ls(self.path)]
+            items = [PurePosixPath(p) for p in self.fs.ls(self.path)]
             items = [p for p in items if not p == self._path]
             items = sorted(items, key=lambda x: x.name)
             self._children = [FSTreeItem(self.fs, p, self) for p in items]
@@ -98,12 +98,12 @@ class QFSSpecModel(QAbstractItemModel):
     def __init__(
         self,
         fs: AbstractFileSystem,
-        root_path: Union[str, PosixPath],
+        root_path: Union[str, PurePosixPath],
         openable_types: List[str],
         parent=None,
     ):
         super().__init__(parent)
-        self._root = FSTreeItem(fs, PosixPath(root_path))
+        self._root = FSTreeItem(fs, PurePosixPath(root_path))
         self._openable_types = openable_types
 
         self._icon_provider = QFileIconProvider()
